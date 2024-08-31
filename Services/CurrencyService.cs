@@ -13,7 +13,7 @@ namespace Demo.Services
             _httpClient = new HttpClient();
         }
 
-        public async Task<List<Currency>> GetAllExchangeRates()
+        public async Task<List<Currency>> GetAllExchangeRatesAsync()
         {
             var url = "https://www.tcmb.gov.tr/kurlar/today.xml";
             var response = await _httpClient.GetAsync(url);

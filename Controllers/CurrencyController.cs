@@ -19,7 +19,7 @@ namespace Demo.Controllers
         [Authorize]
         public async Task<IActionResult> Get()
         {
-            var result = await _currencyService.GetAllExchangeRates();
+            var result = await _currencyService.GetAllExchangeRatesAsync();
             return Ok(result);
         }
     }

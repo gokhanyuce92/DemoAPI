@@ -4,6 +4,6 @@ namespace Demo.Interfaces
 {
     public interface ICurrencyService
     {
-        Task<List<Currency>> GetAllExchangeRates();
+        Task<List<Currency>> GetAllExchangeRatesAsync();
     }
 }
