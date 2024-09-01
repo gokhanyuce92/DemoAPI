@@ -4,8 +4,12 @@ using Demo.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
+
+IConfiguration configuration = builder.Configuration;
+var redisConnection = ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis"));
 
 builder.Services.AddControllers();
 
@@ -38,8 +42,10 @@ builder.Services.AddSwaggerGen(c => {
     });
 });
 
+builder.Services.AddSingleton<IConnectionMultiplexer>(redisConnection);
 builder.Services.AddTransient<ITokenService, TokenService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
+builder.Services.AddSingleton<IRedisCacheService, RedisCacheService>();
 
 builder.Services.AddTransient<ICurrencyService, CurrencyService>();
 
