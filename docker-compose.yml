@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_ROOT_PASSWORD: ''
+      MYSQL_DATABASE: test
+      MYSQL_PASSWORD: ''
+    ports:
+      - '3306:3306'
+    volumes:
+      - db_data:/var/lib/mysql
+  redis:
+    image: redis:latest
+    ports:
+      - '6379:6379'
+    environment:
+      - REDIS_PASSWORD_FILE=/run/secrets/redis_password
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "$(cat /run/secrets/redis_password)", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    command: >
+      sh -c "echo $(cat /run/secrets/redis_password) > /tmp/redis_password && 
+             redis-server /usr/local/etc/redis/redis.conf 
+             --requirepass $(cat /tmp/redis_password)"
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+      - /run/secrets:/run/secrets:ro  # Docker Secrets için mount noktası
+      - redis-data:/data  # Redis verileri için kalıcı depolama alanı
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      MYSQL_USERNAME: root
+      MYSQL_ROOT_PASSWORD: secret
+    ports:
+      - '8081:80'
+    depends_on:
+      - mysql
+
+secrets:
+  redis_password:
+    file: ./redis_password.txt
+volumes:
+  db_data:
+  redis-data:  # Yeni volume tanımlaması

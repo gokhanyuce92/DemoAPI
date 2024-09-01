@@ -11,19 +11,26 @@ namespace Demo.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService authService;
+        private readonly IRedisCacheService redisCacheService;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService, IRedisCacheService redisCacheService)
         {
             this.authService = authService;
+            this.redisCacheService = redisCacheService;
         }
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public async Task<ActionResult<UserLoginResponse>> LoginUserAsync([FromBody] UserLoginRequest request)
+        public async Task<IActionResult> LoginUserAsync([FromBody] UserLoginRequest request)
         {
             var result = await authService.LoginUserAsync(request);
-
-            return result;
+            if (!result.AuthenticateResult)
+            {
+                return Unauthorized("Kullanıcı adı veya şifre hatalı");
+            }
+            
+            redisCacheService.SetValueAsync("authToken", result.AuthToken, TimeSpan.FromMinutes(30));
+            return Ok(result);
         }
     }
 }
