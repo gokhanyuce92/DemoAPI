@@ -15,6 +15,9 @@ redis_password.txt
 .vscode/
 .idea/
 
+# Migrations klasörü
+migrations/
+
 # Paketler
 packages/
 
