@@ -4,6 +4,6 @@ namespace Demo.Interfaces
 {
     public interface ITokenService
     {
-        public Task<GenerateTokenResponse> GenerateTokenAsync(GenerateTokenRequest request);
+        public Task<Result<GenerateTokenResponse>> GenerateTokenAsync(GenerateTokenRequest request);
     }
 }

@@ -1,3 +1,4 @@
+using Demo.Models;
 using Demo.Repositories.Abstract;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,10 +12,19 @@ namespace Demo.Repositories.Concrete
             _context = context;
         }
 
-        public async Task AddAsync(T entity)
+        public async Task<Result<T>> AddAsync(T entity)
         {
-            await _context.Set<T>().AddAsync(entity);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.Set<T>().AddAsync(entity);
+                await _context.SaveChangesAsync();
+                return new Result<T> { IsSuccess = true, Data = entity };
+            }
+            catch (Exception ex)
+            {
+                // Örneğin: _logger.LogError(ex, "Varlık eklenirken hata oluştu."); 
+                return new Result<T> { IsSuccess = false, ErrorMessage = "Varlık eklenirken hata oluştu." + ex.Message };
+            }
         }
 
         public async Task DeleteAsync(int id)

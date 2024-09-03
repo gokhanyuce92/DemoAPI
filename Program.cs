@@ -56,9 +56,12 @@ builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddSingleton<IRedisCacheService, RedisCacheService>();
 
 builder.Services.AddTransient<ICurrencyService, CurrencyService>();
+builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<ICalisanService, CalisanService>();
 
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<ICalisanRepository, CalisanRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddAuthentication(options =>
 {

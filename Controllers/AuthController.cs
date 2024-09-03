@@ -24,13 +24,14 @@ namespace Demo.Controllers
         public async Task<IActionResult> LoginUserAsync([FromBody] UserLoginRequest request)
         {
             var result = await authService.LoginUserAsync(request);
-            if (!result.AuthenticateResult)
+            if (!result.IsSuccess)
             {
-                return Unauthorized("Kullanıcı adı veya şifre hatalı");
+                return BadRequest(result.ErrorMessage);
             }
             
-            redisCacheService.SetValueAsync("authToken", result.AuthToken, TimeSpan.FromMinutes(30));
-            return Ok(result);
+            redisCacheService.SetValueAsync("authToken", result.Data.AuthToken, TimeSpan.FromMinutes(30));
+            
+            return Ok(result.Data);
         }
     }
 }
