@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Demo.Entities;
 using Demo.Repositories.Abstract;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Demo.Controllers
 {
 
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CalisanController : ControllerBase
     {
         private readonly ICalisanRepository _calisanRepository;

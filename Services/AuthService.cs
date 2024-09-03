@@ -6,30 +6,38 @@ namespace Demo.Services
     public class AuthService : IAuthService
     {
         private readonly ITokenService tokenService;
-        public AuthService(ITokenService tokenService)
+        private readonly IUserService userService;
+        public AuthService(ITokenService tokenService, IUserService userService)
         {
             this.tokenService = tokenService;
+            this.userService = userService;
         }
 
-        public async Task<UserLoginResponse> LoginUserAsync(UserLoginRequest request)
+        public async Task<Result<UserLoginResponse>> LoginUserAsync(UserLoginRequest request)
         {
-            UserLoginResponse response = new();
+            if (string.IsNullOrEmpty(request.Username))
+                return new Result<UserLoginResponse> { IsSuccess = false, ErrorMessage = "Kullanıcı adı boş olamaz." };
+            if (string.IsNullOrEmpty(request.Password))
+                return new Result<UserLoginResponse> { IsSuccess = false, ErrorMessage = "Parola boş olamaz." };
 
-            if (string.IsNullOrEmpty(request.Username) || string.IsNullOrEmpty(request.Password))
+            var user = await userService.GetByUsernameAndPasswordAsync(request.Username, request.Password);
+            if (user == null)
+                return new Result<UserLoginResponse> { IsSuccess = false, ErrorMessage = "Geçersiz kullanıcı adı veya parola." };
+
+            var generateTokenResult = await tokenService.GenerateTokenAsync(new GenerateTokenRequest { Username = user.Username });
+            if (!generateTokenResult.IsSuccess)
             {
-                throw new ArgumentNullException(nameof(request));
+                return new Result<UserLoginResponse> { IsSuccess = false, ErrorMessage = generateTokenResult.ErrorMessage };
             }
 
-            if (request.Username == "admin" && request.Password == "123456")
+            var response = new UserLoginResponse
             {
-                var generateToken = await tokenService.GenerateTokenAsync(new GenerateTokenRequest { Username = request.Username });
+                AccessTokenExpireDate = generateTokenResult.Data.TokenExpireDate,
+                AuthenticateResult = true,
+                AuthToken = generateTokenResult.Data.Token
+            };
 
-                response.AccessTokenExpireDate = generateToken.TokenExpireDate;
-                response.AuthenticateResult = true;
-                response.AuthToken = generateToken.Token;
-            }
-
-            return response;
+            return new Result<UserLoginResponse> { IsSuccess = true, Data = response };
         }
     }
 }

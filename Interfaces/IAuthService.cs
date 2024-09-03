@@ -4,6 +4,6 @@ namespace Demo.Interfaces
 {
     public interface IAuthService
     {
-        public Task<UserLoginResponse> LoginUserAsync(UserLoginRequest request);
+        public Task<Result<UserLoginResponse>> LoginUserAsync(UserLoginRequest request);
     }
 }
