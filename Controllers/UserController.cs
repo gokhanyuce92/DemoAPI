@@ -1,5 +1,6 @@
 using Demo.Entities;
 using Demo.Interfaces;
+using Demo.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,7 +8,6 @@ namespace Demo.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -16,15 +16,8 @@ namespace Demo.Controllers
             _userService = userService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Get(string username)
-        {
-            var user = await _userService.GetByUsernameAsync(username);
-            return Ok(user);
-        }
-
         [HttpPost]
-        public async Task<IActionResult> Post(User user)
+        public async Task<IActionResult> Post(UserLoginRequest user)
         {
             var result = await _userService.AddAsync(user);
             if (!result.IsSuccess)

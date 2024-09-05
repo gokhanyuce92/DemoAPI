@@ -2,9 +2,9 @@ using Demo.Entities;
 
 namespace Demo.Repositories.Abstract
 {
-    public interface IUserRepository : IGenericRepository<User>
+    public interface IUserRepository : IGenericRepository<AppUser>
     {
-        Task<User> GetByUsernameAsync(string username);
-        Task<User> GetByUsernameAndPasswordAsync(string username, string password);
+        Task<AppUser> GetByUsernameAsync(string username);
+        Task<AppUser> GetByUsernameAndPasswordAsync(string username, string password);
     }
 }

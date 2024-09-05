@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Demo.Repositories.Concrete
 {
-    public class UserRepository : GenericRepository<User>, IUserRepository
+    public class UserRepository : GenericRepository<AppUser>, IUserRepository
     {
         private readonly MyDbContext _context;
         public UserRepository(MyDbContext context) : base(context)
@@ -12,14 +12,15 @@ namespace Demo.Repositories.Concrete
             _context = context;
         }
 
-        public async Task<User> GetByUsernameAsync(string username)
+        public async Task<AppUser> GetByUsernameAsync(string username)
         {
-            return await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+            return await _context.Users.FirstOrDefaultAsync(x => x.UserName == username);
         }
 
-        public async Task<User> GetByUsernameAndPasswordAsync(string username, string password)
+        public async Task<AppUser> GetByUsernameAndPasswordAsync(string username, string password)
         {
-            return await _context.Users.FirstOrDefaultAsync(x => x.Username == username && x.Password == password);
+            // return await _context.Users.FirstOrDefaultAsync(x => x.Username == username && x.Password == password);
+            return await _context.Users.FirstOrDefaultAsync(x => x.UserName == username);
         }
     }
 }

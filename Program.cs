@@ -1,23 +1,48 @@
 using System.Text;
+using Demo.Entities;
 using Demo.Interfaces;
 using Demo.Repositories.Abstract;
 using Demo.Repositories.Concrete;
 using Demo.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
 IConfiguration configuration = builder.Configuration;
 var redisConnection = ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis"));
-var mySqlConnection = configuration.GetConnectionString("MyDbContext");
+var MySQLConnection = configuration.GetConnectionString("MySQLConnection");
 
+// Serilog yapılandırması
+var logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .WriteTo.MySQL(
+        connectionString: MySQLConnection,
+        tableName: "Logs"
+    )
+    // .Enrich.With(new UserNameEnricher(builder.Services.BuildServiceProvider().GetService<IHttpContextAccessor>()))
+    .CreateLogger();
+builder.Logging.ClearProviders();
+// Add Serilog Library
+builder.Logging.AddSerilog(logger);
+    
 builder.Services.AddDbContext<MyDbContext>(options =>
-    options.UseMySql(mySqlConnection, 
+    options.UseMySql(MySQLConnection, 
         new MySqlServerVersion(new Version(8, 0, 28)))); // MySQL sürümünüzü belirtin
+
+builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
+{
+    options.User.RequireUniqueEmail = true;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 6;
+}).AddEntityFrameworkStores<MyDbContext>()
+.AddDefaultTokenProviders()
+.AddTokenProvider<DataProtectorTokenProvider<AppUser>>("DataProtectorTokenProvider<AppUser>");
 
 builder.Services.AddControllers();
 
@@ -96,6 +121,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<TokenAuthenticationMiddleware>();
 
 app.MapControllers();
 

@@ -1,30 +1,37 @@
 using Demo.Entities;
 using Demo.Interfaces;
 using Demo.Models;
-using Demo.Repositories.Abstract;
+using Microsoft.AspNetCore.Identity;
 
 namespace Demo.Services {
     public class UserService : IUserService
     {
-        private readonly IUserRepository _userRepository;
-        public UserService(IUserRepository userRepository)
+        private readonly UserManager<AppUser> _userManager;
+        public UserService(UserManager<AppUser> userManager)
         {
-            _userRepository = userRepository;
+            this._userManager = userManager;
         }
 
-        public async Task<Result<User>> AddAsync(User user)
+        public async Task<Result<string>> AddAsync(UserLoginRequest user)
         {
-            return await _userRepository.AddAsync(user);
-        }
+            var identityUser = new AppUser
+            {
+                UserName = user.Username,
+                Email = user.Email,
+                FirstName = user.Username,
+                LastName = user.Username
+            };
+            var passwordHash = _userManager.PasswordHasher;
+            var hashedPassword = passwordHash.HashPassword(identityUser, user.Password);
+            identityUser.PasswordHash = hashedPassword;
 
-        public async Task<User> GetByUsernameAsync(string username)
-        {
-            return await _userRepository.GetByUsernameAsync(username);
-        }
+            var result = await _userManager.CreateAsync(identityUser);
+            if (!result.Succeeded)
+            {
+                return new Result<string> { IsSuccess = false, ErrorMessage = result.Errors.FirstOrDefault().Description };
+            }
 
-        public async Task<User> GetByUsernameAndPasswordAsync(string username, string password)
-        {
-            return await _userRepository.GetByUsernameAndPasswordAsync(username, password);
+            return new Result<string> { IsSuccess = true, Data = "Kullanıcı başarıyla kaydedilmiştir." };
         }
     }
 }
