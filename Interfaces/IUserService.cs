@@ -5,8 +5,6 @@ namespace Demo.Interfaces
 {
     public interface IUserService
     {
-        Task<User> GetByUsernameAsync(string username);
-        Task<User> GetByUsernameAndPasswordAsync(string username, string password);
-        Task<Result<User>> AddAsync(User user);
+        Task<Result<string>> AddAsync(UserLoginRequest user);
     }
 }
