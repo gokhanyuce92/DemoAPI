@@ -82,6 +82,8 @@ builder.Services.AddSingleton<IRedisCacheService, RedisCacheService>();
 
 builder.Services.AddTransient<ICurrencyService, CurrencyService>();
 builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IRoleService, RoleService>();
+builder.Services.AddTransient<IUserRoleService, UserRoleService>();
 builder.Services.AddTransient<ICalisanService, CalisanService>();
 
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -102,8 +104,9 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Secret"])),
         ValidateIssuer = true,
         ValidateAudience = true,
-        ValidateLifetime = false,
-        ValidateIssuerSigningKey = true
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ClockSkew = TimeSpan.Zero
     };
 });
 
@@ -122,7 +125,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseMiddleware<TokenAuthenticationMiddleware>();
+// app.UseMiddleware<TokenAuthenticationMiddleware>();
 
 app.MapControllers();
 

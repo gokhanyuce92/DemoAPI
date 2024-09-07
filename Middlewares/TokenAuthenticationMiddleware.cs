@@ -15,12 +15,12 @@ public class TokenAuthenticationMiddleware
         var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").LastOrDefault();
         if (token != null)
         {
-            var userNameClaim = context.User.Claims.FirstOrDefault(c => c.Type == "Username");
-            if (userNameClaim != null)
+            var userIdClaim = context.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim != null)
             {
-                var userName = userNameClaim.Value;
+                var userId = userIdClaim.Value;
                 var isValid = await userManager.VerifyUserTokenAsync(
-                    await userManager.FindByNameAsync(userName),
+                    await userManager.FindByIdAsync(userId),
                     "DataProtectorTokenProvider<AppUser>",
                     "Token",
                     token);

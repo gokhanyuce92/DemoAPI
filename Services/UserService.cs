@@ -3,7 +3,8 @@ using Demo.Interfaces;
 using Demo.Models;
 using Microsoft.AspNetCore.Identity;
 
-namespace Demo.Services {
+namespace Demo.Services 
+{
     public class UserService : IUserService
     {
         private readonly UserManager<AppUser> _userManager;
