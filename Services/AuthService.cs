@@ -8,14 +8,12 @@ namespace Demo.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly MyDbContext _context;
         private readonly ITokenService tokenService;
         private readonly UserManager<AppUser> _userManager;
-        public AuthService(ITokenService tokenService, UserManager<AppUser> userManager, MyDbContext context)
+        public AuthService(ITokenService tokenService, UserManager<AppUser> userManager)
         {
             this.tokenService = tokenService;
             this._userManager = userManager;
-            this._context = context;
         }
 
         public async Task<Result<UserLoginResponse>> LoginUserAsync(UserLoginRequest request)
@@ -29,7 +27,7 @@ namespace Demo.Services
             if (user != null && await _userManager.CheckPasswordAsync(user, request.Password))
             {
                 // Kullanıcı adı ve şifre doğru
-                var generateTokenResult = await tokenService.GenerateTokenAsync(new GenerateTokenRequest { Username = user.UserName });
+                var generateTokenResult = await tokenService.GenerateTokenAsync(new GenerateTokenRequest { UserId = user.Id.ToString(), UserName = user.UserName });
                 if (!generateTokenResult.IsSuccess)
                 {
                     return new Result<UserLoginResponse> { IsSuccess = false, ErrorMessage = generateTokenResult.ErrorMessage };
@@ -41,27 +39,6 @@ namespace Demo.Services
                     AuthenticateResult = true,
                     AuthToken = generateTokenResult.Data.Token
                 };
-                var existingToken = await _context.UserTokens.FirstOrDefaultAsync(
-                    ut => ut.UserId == user.Id && 
-                        ut.LoginProvider == "DataProtectorTokenProvider<AppUser>" && 
-                        ut.Name == "Token");
-                if (existingToken != null)
-                {
-                    existingToken.Value = response.AuthToken;
-                    await _context.SaveChangesAsync();
-                }
-                else
-                {
-                    await _context.UserTokens.AddAsync(new IdentityUserToken<string>
-                    {
-                        UserId = user.Id,
-                        LoginProvider = "DataProtectorTokenProvider<AppUser>",
-                        Name = "Token",
-                        Value = response.AuthToken
-                    });
-                 
-                    await _context.SaveChangesAsync();
-                }
 
                 return new Result<UserLoginResponse> { IsSuccess = true, Data = response };
             }
