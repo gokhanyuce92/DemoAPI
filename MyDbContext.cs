@@ -10,6 +10,7 @@ public class MyDbContext : IdentityDbContext<AppUser, IdentityRole, string>
     }
 
     public DbSet<Calisan> Calisanlar { get; set; }
+    public DbSet<ControllerActionRole> ControllerActionRoles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -27,5 +28,10 @@ public class MyDbContext : IdentityDbContext<AppUser, IdentityRole, string>
         });
 
         modelBuilder.Entity<Calisan>().HasKey(x => x.Id);
+
+        modelBuilder.Entity<ControllerActionRole>()
+            .HasOne(x => x.Role)
+            .WithMany()
+            .HasForeignKey(x => x.RoleId);
     }
 }

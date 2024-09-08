@@ -85,10 +85,12 @@ builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IRoleService, RoleService>();
 builder.Services.AddTransient<IUserRoleService, UserRoleService>();
 builder.Services.AddTransient<ICalisanService, CalisanService>();
+builder.Services.AddTransient<IControllerActionRoleService, ControllerActionRoleService>();
 
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<ICalisanRepository, CalisanRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IControllerActionRoleRepository, ControllerActionRoleRepository>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -126,6 +128,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // app.UseMiddleware<TokenAuthenticationMiddleware>();
+// app.UseMiddleware<AuthorizationMiddleware>();
 
 app.MapControllers();
 
