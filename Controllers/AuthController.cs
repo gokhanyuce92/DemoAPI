@@ -34,7 +34,7 @@ namespace Demo.Controllers
                 return BadRequest(result.ErrorMessage);
             }
             
-            redisCacheService.SetValueAsync("authToken", result.Data.AuthToken, TimeSpan.FromMinutes(30));
+            await redisCacheService.SetValueAsync("AuthToken", result.Data.AuthToken);
             
             return Ok(result.Data);
         }
