@@ -1,4 +1,5 @@
 using Demo.DTOs;
+using Demo.DTOs.Role;
 using Demo.Interfaces;
 using Demo.Models;
 using Microsoft.AspNetCore.Identity;
@@ -13,59 +14,59 @@ namespace Demo.Services
             this._roleManager = roleManager;
         }
 
-        public async Task<Result<string>> CreateRoleAsync(string roleName)
+        public async Task<CreateRoleResponseDTO> CreateRoleAsync(CreateRoleRequestDTO createRoleRequestDTO)
         {
-            if (string.IsNullOrEmpty(roleName))
+            if (string.IsNullOrEmpty(createRoleRequestDTO.RoleName))
             {
-                return new Result<string> { IsSuccess = false, ErrorMessage = "Rol adı boş olamaz." };
+                return new CreateRoleResponseDTO { IsSuccess = false, ErrorMessage = "Rol adı boş olamaz." };
             }
             var identityRole = new IdentityRole
             {
-                Name = roleName
+                Name = createRoleRequestDTO.RoleName
             };
 
             var result = await _roleManager.CreateAsync(identityRole);
             if (!result.Succeeded)
             {
-                return new Result<string> { IsSuccess = false, ErrorMessage = result.Errors.FirstOrDefault().Description };
+                return new CreateRoleResponseDTO { IsSuccess = false, ErrorMessage = result.Errors.FirstOrDefault().Description };
             }
 
-            return new Result<string> { IsSuccess = true, Data = "Rol başarıyla kaydedilmiştir." };
+            return new CreateRoleResponseDTO { IsSuccess = true, Data = createRoleRequestDTO };
         }
 
-        public ICollection<RoleDto> GetRoles()
+        public ICollection<GetRolesResponseDTO> GetRoles()
         {
             var roles = _roleManager.Roles.ToList();
-            var roleDtos = roles.Select(x => new RoleDto
+            var getRolesResponses = roles.Select(x => new GetRolesResponseDTO
             {
                 Id = x.Id,
                 Name = x.Name
             }).ToList();
 
-            return roleDtos;
+            return getRolesResponses;
         }
 
-        public async Task<Result<string>> UpdateRoleAsync(string roleId, string roleName)
+        public async Task<UpdateRoleResponseDTO> UpdateRoleAsync(UpdateRoleRequestDTO updateRoleRequestDTO)
         {
-            if (string.IsNullOrEmpty(roleName))
+            if (string.IsNullOrEmpty(updateRoleRequestDTO.RoleName))
             {
-                return new Result<string> { IsSuccess = false, ErrorMessage = "Rol adı boş olamaz." };
+                return new UpdateRoleResponseDTO { IsSuccess = false, ErrorMessage = "Rol adı boş olamaz." };
             }
 
-            var role = await _roleManager.FindByIdAsync(roleId);
+            var role = await _roleManager.FindByIdAsync(updateRoleRequestDTO.RoleId);
             if (role == null)
             {
-                return new Result<string> { IsSuccess = false, ErrorMessage = "Rol bulunamadı." };
+                return new UpdateRoleResponseDTO { IsSuccess = false, ErrorMessage = "Rol bulunamadı." };
             }
 
-            role.Name = roleName;
+            role.Name = updateRoleRequestDTO.RoleName;
             var result = await _roleManager.UpdateAsync(role);
             if (!result.Succeeded)
             {
-                return new Result<string> { IsSuccess = false, ErrorMessage = result.Errors.FirstOrDefault().Description };
+                return new UpdateRoleResponseDTO { IsSuccess = false, ErrorMessage = result.Errors.FirstOrDefault().Description };
             }
 
-            return new Result<string> { IsSuccess = true, Data = "Rol başarıyla güncellenmiştir." };
+            return new UpdateRoleResponseDTO { IsSuccess = true, Data = updateRoleRequestDTO };
         }
     }
 }

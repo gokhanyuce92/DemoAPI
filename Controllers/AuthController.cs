@@ -29,7 +29,7 @@ namespace Demo.Controllers
             var result = await authService.LoginUserAsync(request);
             if (!result.IsSuccess)
             {
-                _logger.LogWarning(result.ErrorMessage);
+                _logger.LogError(result.ErrorMessage);
 
                 return BadRequest(result.ErrorMessage);
             }

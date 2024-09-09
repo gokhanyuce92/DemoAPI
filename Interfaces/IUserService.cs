@@ -1,10 +1,10 @@
-using Demo.Entities;
+using Demo.DTOs.User;
 using Demo.Models;
 
 namespace Demo.Interfaces
 {
     public interface IUserService
     {
-        Task<Result<string>> AddAsync(UserLoginRequest user);
+        Task<AddUserResponseDTO> AddAsync(AddUserRequestDTO addUserRequestDTO);
     }
 }

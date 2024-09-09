@@ -12,19 +12,10 @@ namespace Demo.Repositories.Concrete
             _context = context;
         }
 
-        public async Task<Result<T>> AddAsync(T entity)
+        public async Task AddAsync(T entity)
         {
-            try
-            {
-                await _context.Set<T>().AddAsync(entity);
-                await _context.SaveChangesAsync();
-                return new Result<T> { IsSuccess = true, Data = entity };
-            }
-            catch (Exception ex)
-            {
-                // Örneğin: _logger.LogError(ex, "Varlık eklenirken hata oluştu."); 
-                return new Result<T> { IsSuccess = false, ErrorMessage = "Varlık eklenirken hata oluştu." + ex.Message };
-            }
+            await _context.Set<T>().AddAsync(entity);
+            await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id)

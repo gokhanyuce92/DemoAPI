@@ -1,4 +1,5 @@
 using Demo.DTOs;
+using Demo.DTOs.UserRole;
 using Demo.Entities;
 using Demo.Interfaces;
 using Demo.Models;
@@ -10,7 +11,6 @@ namespace Demo.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
     public class UserRoleController : ControllerBase
     {
         private readonly IUserRoleService _userRoleService;
@@ -20,36 +20,39 @@ namespace Demo.Controllers
         }
 
         [HttpGet("GetUserRoles")]
-        public async Task<IActionResult> GetUserRolesAsync(string userName)
+        public async Task<IActionResult> GetUserRolesAsync(GetUserRolesRequestDTO getUserRolesRequestDTO)
         {
-            var result = await _userRoleService.GetUserRolesAsync(userName);
-            if (!result.IsSuccess)
+            var response = await _userRoleService.GetUserRolesAsync(getUserRolesRequestDTO);
+            if (!response.IsSuccess)
             {
-                return BadRequest(result.ErrorMessage);
+                return BadRequest(response);
             }
-            return Ok(result.Data);
+
+            return Ok(response);
         }
 
         [HttpPost("AddUserToRole")]
-        public async Task<IActionResult> AddUserToRoleAsync(UserRoleDto userRoleDto)
+        public async Task<IActionResult> AddUserToRoleAsync(AddUserRoleRequestDTO addUserRoleRequestDTO)
         {
-            var result = await _userRoleService.AddUserToRoleAsync(userRoleDto);
-            if (!result.IsSuccess)
+            var response = await _userRoleService.AddUserRoleAsync(addUserRoleRequestDTO);
+            if (!response.IsSuccess)
             {
-                return BadRequest(result.ErrorMessage);
+                return BadRequest(response);
             }
-            return Ok(result.Data);
+
+            return Ok(response);
         }
 
         [HttpPost("RemoveUserFromRole")]
-        public async Task<IActionResult> RemoveUserFromRoleAsync(UserRoleDto userRoleDto)
+        public async Task<IActionResult> RemoveUserFromRoleAsync(RemoveUserRoleRequestDTO removeUserRoleRequestDTO)
         {
-            var result = await _userRoleService.RemoveUserFromRoleAsync(userRoleDto);
-            if (!result.IsSuccess)
+            var response = await _userRoleService.RemoveUserRoleAsync(removeUserRoleRequestDTO);
+            if (!response.IsSuccess)
             {
-                return BadRequest(result.ErrorMessage);
+                return BadRequest(response);
             }
-            return Ok(result.Data);
+
+            return Ok(response);
         }
     }
 }

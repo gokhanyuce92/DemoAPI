@@ -1,3 +1,4 @@
+using Demo.DTOs.User;
 using Demo.Entities;
 using Demo.Interfaces;
 using Demo.Models;
@@ -13,26 +14,26 @@ namespace Demo.Services
             this._userManager = userManager;
         }
 
-        public async Task<Result<string>> AddAsync(UserLoginRequest user)
+        public async Task<AddUserResponseDTO> AddAsync(AddUserRequestDTO addUserRequestDTO)
         {
             var identityUser = new AppUser
             {
-                UserName = user.Username,
-                Email = user.Email,
-                FirstName = user.Username,
-                LastName = user.Username
+                UserName = addUserRequestDTO.Username,
+                Email = addUserRequestDTO.Email,
+                FirstName = addUserRequestDTO.Username,
+                LastName = addUserRequestDTO.Username
             };
             var passwordHash = _userManager.PasswordHasher;
-            var hashedPassword = passwordHash.HashPassword(identityUser, user.Password);
+            var hashedPassword = passwordHash.HashPassword(identityUser, addUserRequestDTO.Password);
             identityUser.PasswordHash = hashedPassword;
 
             var result = await _userManager.CreateAsync(identityUser);
             if (!result.Succeeded)
             {
-                return new Result<string> { IsSuccess = false, ErrorMessage = result.Errors.FirstOrDefault().Description };
+                return new AddUserResponseDTO { IsSuccess = false, ErrorMessage = result.Errors.FirstOrDefault().Description };
             }
 
-            return new Result<string> { IsSuccess = true, Data = "Kullanıcı başarıyla kaydedilmiştir." };
+            return new AddUserResponseDTO { IsSuccess = true, Data = addUserRequestDTO };
         }
     }
 }

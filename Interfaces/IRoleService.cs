@@ -1,12 +1,12 @@
-using Demo.DTOs;
+using Demo.DTOs.Role;
 using Demo.Models;
 
 namespace Demo.Interfaces
 {
     public interface IRoleService
     {
-        Task<Result<string>> CreateRoleAsync(string roleName);
-        ICollection<RoleDto> GetRoles();
-        Task<Result<string>> UpdateRoleAsync(string roleId, string roleName);
+        Task<CreateRoleResponseDTO> CreateRoleAsync(CreateRoleRequestDTO createRoleRequestDTO);
+        ICollection<GetRolesResponseDTO> GetRoles();
+        Task<UpdateRoleResponseDTO> UpdateRoleAsync(UpdateRoleRequestDTO updateRoleRequestDTO);
     }
 }
