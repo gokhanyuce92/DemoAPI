@@ -1,8 +1,7 @@
-namespace Demo.DTOs
+namespace Demo.DTOs.ControllerActionRole
 {
-    public class ControllerActionRoleDto
+    public class AddControllerActionRoleRequestDTO
     {
-        public int Id { get; set; }
         public string ControllerName { get; set; }
         public string ActionName { get; set; }
         public string RoleId { get; set; }

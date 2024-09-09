@@ -1,3 +1,4 @@
+using Demo.DTOs.Role;
 using Demo.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,27 +23,27 @@ namespace Demo.Controllers
         }
 
         [HttpPost("CreateRole")]
-        public async Task<IActionResult> CreateRoleAsync(string roleName)
+        public async Task<IActionResult> CreateRoleAsync(CreateRoleRequestDTO createRoleRequestDTO)
         {
-            var result = await _roleService.CreateRoleAsync(roleName);
-            if (!result.IsSuccess)
+            var response = await _roleService.CreateRoleAsync(createRoleRequestDTO);
+            if (!response.IsSuccess)
             {
-                return BadRequest(result.ErrorMessage);
+                return BadRequest(response);
             }
 
-            return Ok(result.Data);
+            return Ok(response);
         }
 
         [HttpPut("UpdateRole")]
-        public async Task<IActionResult> UpdateRoleAsync(string roleId, string roleName)
+        public async Task<IActionResult> UpdateRoleAsync(UpdateRoleRequestDTO updateRoleRequestDTO)
         {
-            var result = await _roleService.UpdateRoleAsync(roleId, roleName);
-
-            if (!result.IsSuccess)
+            var response = await _roleService.UpdateRoleAsync(updateRoleRequestDTO);
+            if (!response.IsSuccess)
             {
-                return BadRequest(result.ErrorMessage);
+                return BadRequest(response);
             }
-            return Ok(result.Data);
+            
+            return Ok(response);
         }
     }
 }

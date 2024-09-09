@@ -1,12 +1,13 @@
 using Demo.DTOs;
+using Demo.DTOs.UserRole;
 using Demo.Models;
 
 namespace Demo.Interfaces
 {
     public interface IUserRoleService
     {
-        Task<Result<List<string>>> GetUserRolesAsync(string userName);
-        Task<Result<UserRoleDto>> AddUserToRoleAsync(UserRoleDto userRoleDto);
-        Task<Result<UserRoleDto>> RemoveUserFromRoleAsync(UserRoleDto userRoleDto);
+        Task<GetUserRolesResponseDTO> GetUserRolesAsync(GetUserRolesRequestDTO getUserRolesRequestDTO);
+        Task<AddUserRoleResponseDTO> AddUserRoleAsync(AddUserRoleRequestDTO addUserRoleRequestDTO);
+        Task<RemoveUserRoleResponseDTO> RemoveUserRoleAsync(RemoveUserRoleRequestDTO removeUserRoleRequestDTO);
     }
 }

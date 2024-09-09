@@ -1,4 +1,5 @@
 using Demo.DTOs;
+using Demo.DTOs.UserRole;
 using Demo.Entities;
 using Demo.Interfaces;
 using Demo.Models;
@@ -16,74 +17,66 @@ namespace Demo.Services
             this._userManager = userManager;
         }
 
-        public async Task<Result<List<string>>> GetUserRolesAsync(string userName)
+        public async Task<GetUserRolesResponseDTO> GetUserRolesAsync(GetUserRolesRequestDTO getUserRolesRequestDTO)
         {
-            var user = await _userManager.FindByNameAsync(userName);
+            var user = await _userManager.FindByNameAsync(getUserRolesRequestDTO.UserName);
             if (user == null)
             {
-                return new Result<List<string>> { IsSuccess = false, ErrorMessage = "Kullanıcı bulunamadı." };
+                return new GetUserRolesResponseDTO { IsSuccess = false, ErrorMessage = "Kullanıcı bulunamadı." };
             }
 
             var roles = await _userManager.GetRolesAsync(user);
-            if (roles.Count == 0)
-            {
-                return new Result<List<string>> { IsSuccess = false, ErrorMessage = "Kullanıcıya ait rol bulunamadı." };
-            }
-            return new Result<List<string>> { IsSuccess = true, Data = roles.ToList() };
+            return new GetUserRolesResponseDTO { IsSuccess = true, Data = roles.ToList() };
         }
 
-        public async Task<Result<UserRoleDto>> AddUserToRoleAsync(UserRoleDto userRoleDto)
+        public async Task<AddUserRoleResponseDTO> AddUserRoleAsync(AddUserRoleRequestDTO addUserRoleRequestDTO)
         {
-            var user = await _userManager.FindByIdAsync(userRoleDto.UserId);
+            var user = await _userManager.FindByIdAsync(addUserRoleRequestDTO.UserId);
 
             if (user == null)
             {
-                user = await _userManager.FindByNameAsync(userRoleDto.UserName);
+                user = await _userManager.FindByNameAsync(addUserRoleRequestDTO.UserName);
             }
             if (user == null)
             {
-                return new Result<UserRoleDto> { IsSuccess = false, ErrorMessage = "Kullanıcı bulunamadı." };
+                return new AddUserRoleResponseDTO { IsSuccess = false, ErrorMessage = "Kullanıcı bulunamadı." };
             }
 
-            var roleExists = await _roleManager.RoleExistsAsync(userRoleDto.RoleName);
+            var roleExists = await _roleManager.RoleExistsAsync(addUserRoleRequestDTO.RoleName);
             if (!roleExists)
             {
-                return new Result<UserRoleDto> { IsSuccess = false, ErrorMessage = "Rol bulunamadı." };
+                return new AddUserRoleResponseDTO { IsSuccess = false, ErrorMessage = "Rol bulunamadı." };
             }
 
-            var result = await _userManager.AddToRoleAsync(user, userRoleDto.RoleName);
+            var result = await _userManager.AddToRoleAsync(user, addUserRoleRequestDTO.RoleName);
             if (!result.Succeeded)
             {
-                return new Result<UserRoleDto> { IsSuccess = false, ErrorMessage = result.Errors.FirstOrDefault().Description };
+                return new AddUserRoleResponseDTO { IsSuccess = false, ErrorMessage = result.Errors.FirstOrDefault().Description };
             }
 
-            return new Result<UserRoleDto> { IsSuccess = true, Data = userRoleDto };
+            return new AddUserRoleResponseDTO { IsSuccess = true, Data = addUserRoleRequestDTO };
         }
 
-        public async Task<Result<UserRoleDto>> RemoveUserFromRoleAsync(UserRoleDto userRoleDto)
+        public async Task<RemoveUserRoleResponseDTO> RemoveUserRoleAsync(RemoveUserRoleRequestDTO removeUserRoleRequestDTO)
         {
-            var user = await _userManager.FindByIdAsync(userRoleDto.UserId);
+            var user = await _userManager.FindByIdAsync(removeUserRoleRequestDTO.UserId);
 
             if (user == null)
             {
-                user = await _userManager.FindByNameAsync(userRoleDto.UserName);
-            }
-            if (user == null)
-            {
-                return new Result<UserRoleDto> { IsSuccess = false, ErrorMessage = "Kullanıcı bulunamadı." };
+                return new RemoveUserRoleResponseDTO { IsSuccess = false, ErrorMessage = "Kullanıcı bulunamadı." };
             }
 
-            var roleExists = await _roleManager.RoleExistsAsync(userRoleDto.RoleName);
+            var roleExists = await _roleManager.RoleExistsAsync(removeUserRoleRequestDTO.RoleName);
             if (!roleExists)
             {
-                return new Result<UserRoleDto> { IsSuccess = false, ErrorMessage = "Rol bulunamadı." };
+                return new RemoveUserRoleResponseDTO { IsSuccess = false, ErrorMessage = "Rol bulunamadı." };
             }
-            var result = await _userManager.RemoveFromRoleAsync(user, userRoleDto.RoleName);
+            var result = await _userManager.RemoveFromRoleAsync(user, removeUserRoleRequestDTO.RoleName);
             if (!result.Succeeded)
             {
-                return new Result<UserRoleDto> { IsSuccess = false, ErrorMessage = result.Errors.FirstOrDefault().Description };
+                return new RemoveUserRoleResponseDTO { IsSuccess = false, ErrorMessage = result.Errors.FirstOrDefault().Description };
             }
-            return new Result<UserRoleDto> { IsSuccess = true, Data = userRoleDto };
+            return new RemoveUserRoleResponseDTO { IsSuccess = true, Data = removeUserRoleRequestDTO };
         }
     }
 }

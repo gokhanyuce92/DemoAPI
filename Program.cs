@@ -1,6 +1,7 @@
 using System.Text;
 using Demo.Entities;
 using Demo.Interfaces;
+using Demo.Mapping;
 using Demo.Repositories.Abstract;
 using Demo.Repositories.Concrete;
 using Demo.Services;
@@ -74,6 +75,8 @@ builder.Services.AddSwaggerGen(c => {
         }
     });
 });
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(redisConnection);
 builder.Services.AddTransient<ITokenService, TokenService>();

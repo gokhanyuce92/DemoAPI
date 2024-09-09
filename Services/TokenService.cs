@@ -30,7 +30,7 @@ namespace Demo.Services
                     new Claim(ClaimTypes.Name, request.UserName),
                 };
 
-                var roles = await _userRoleService.GetUserRolesAsync(request.UserName);
+                var roles = await _userRoleService.GetUserRolesAsync(new() { UserName = request.UserName });
                 if (roles.IsSuccess)
                 {
                     foreach (var role in roles.Data)

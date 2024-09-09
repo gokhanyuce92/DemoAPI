@@ -1,4 +1,6 @@
-using Demo.DTOs;
+using AutoMapper;
+using Demo.DTOs.ControllerActionRole;
+using Demo.Entities;
 using Demo.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,21 +17,17 @@ namespace Demo.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddAsync(ControllerActionRoleDto controllerActionRole)
+        public async Task<IActionResult> AddAsync(AddControllerActionRoleRequestDTO addControllerActionRoleDTO)
         {
-            var result = await _controllerActionRoleService.AddAsync(
-                new()
-                {
-                    ControllerName = controllerActionRole.ControllerName,
-                    ActionName = controllerActionRole.ActionName,
-                    RoleId = controllerActionRole.RoleId
-                });
-            if (!result.IsSuccess)
+            try
             {
-                return BadRequest(result.ErrorMessage);
+                await _controllerActionRoleService.AddAsync(addControllerActionRoleDTO);
             }
-
-            return Ok(result.Data);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            return Ok("ControllerActionRole added successfully");
         }
     }
 }

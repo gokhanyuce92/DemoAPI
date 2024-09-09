@@ -1,3 +1,5 @@
+using AutoMapper;
+using Demo.DTOs.ControllerActionRole;
 using Demo.Entities;
 using Demo.Interfaces;
 using Demo.Models;
@@ -8,20 +10,22 @@ namespace Demo.Services
     public class ControllerActionRoleService : IControllerActionRoleService
     {
         private readonly IControllerActionRoleRepository _controllerActionRoleRepository;
-        public ControllerActionRoleService(IControllerActionRoleRepository controllerActionRoleRepository)
+        private readonly IMapper _mapper;
+        public ControllerActionRoleService(IControllerActionRoleRepository controllerActionRoleRepository, IMapper mapper)
         {
             _controllerActionRoleRepository = controllerActionRoleRepository;
+            _mapper = mapper;
         }
 
-        public async Task<Result<ControllerActionRole>> AddAsync(ControllerActionRole controllerActionRole)
+        public async Task AddAsync(AddControllerActionRoleRequestDTO controllerActionRole)
         {
-            return await _controllerActionRoleRepository.AddAsync(controllerActionRole);
+            var request = _mapper.Map<ControllerActionRole>(controllerActionRole);
+            await _controllerActionRoleRepository.AddAsync(request);
         }
 
         public async Task DeleteAsync(int id)
         {
             await _controllerActionRoleRepository.DeleteAsync(id);
         }
-
     }
 }

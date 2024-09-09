@@ -7,6 +7,7 @@ namespace Demo.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CurrencyController : ControllerBase
     {
         private readonly ICurrencyService _currencyService;

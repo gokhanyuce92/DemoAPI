@@ -1,7 +1,6 @@
-namespace Demo.DTOs
+namespace Demo.DTOs.Role
 {
-    [Serializable]
-    public class RoleDto
+    public class GetRolesResponseDTO
     {
         public string Id { get; set; }
         public string Name { get; set; }

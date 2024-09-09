@@ -1,3 +1,4 @@
+using Demo.DTOs.User;
 using Demo.Entities;
 using Demo.Interfaces;
 using Demo.Models;
@@ -18,15 +19,15 @@ namespace Demo.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(UserLoginRequest user)
+        public async Task<IActionResult> Post(AddUserRequestDTO addUserRequestDTO)
         {
-            var result = await _userService.AddAsync(user);
-            if (!result.IsSuccess)
+            var response = await _userService.AddAsync(addUserRequestDTO);
+            if (!response.IsSuccess)
             {
-                return BadRequest(result.ErrorMessage);
+                return BadRequest(response);
             }
 
-            return Ok(result.Data);
+            return Ok(response);
         }
     }
 }
