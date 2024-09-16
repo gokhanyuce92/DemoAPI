@@ -9,6 +9,7 @@ appsettings.*.json
 .env
 redis_password.txt
 *.sln
+*.vsidx
 
 # IDE yapılandırmaları
 .idx/

@@ -27,6 +27,7 @@ namespace Demo.Controllers
         public async Task<IActionResult> LoginUserAsync([FromBody] UserLoginRequest request)
         {
             var result = await authService.LoginUserAsync(request);
+
             if (!result.IsSuccess)
             {
                 _logger.LogError(result.ErrorMessage);
