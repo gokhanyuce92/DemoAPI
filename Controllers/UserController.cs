@@ -22,6 +22,7 @@ namespace Demo.Controllers
         public async Task<IActionResult> Post(AddUserRequestDTO addUserRequestDTO)
         {
             var response = await _userService.AddAsync(addUserRequestDTO);
+
             if (!response.IsSuccess)
             {
                 return BadRequest(response);
