@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Nest;
 using Serilog;
 using StackExchange.Redis;
 
@@ -47,6 +48,18 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 
 builder.Services.AddControllers();
 
+// CORS hizmetini ekleyin ve politikayı tanımlayın
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+        });
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c => {
     c.SwaggerDoc("v1", new OpenApiInfo
@@ -76,7 +89,17 @@ builder.Services.AddSwaggerGen(c => {
     });
 });
 
+
 builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+// Elasticsearch bağlantı ayarlarını yapılandırın
+var elasticUri = configuration["Elasticsearch:Uri"];
+var defaultIndex = configuration["Elasticsearch:DefaultIndex"];
+var settings = new ConnectionSettings(new Uri(elasticUri))
+    .DefaultIndex(defaultIndex);
+
+var client = new ElasticClient(settings);
+builder.Services.AddSingleton<IElasticClient>(client);
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(redisConnection);
 builder.Services.AddTransient<ITokenService, TokenService>();
@@ -124,6 +147,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("AllowAllOrigins");
 
 app.UseHttpsRedirection();
 
