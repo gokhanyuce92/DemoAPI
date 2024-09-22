@@ -1,5 +1,6 @@
+using Demo.Interfaces;
+using Demo.Models;
 using Microsoft.AspNetCore.Mvc;
-using Nest;
 
 namespace Demo.Controllers
 {
@@ -7,107 +8,68 @@ namespace Demo.Controllers
     [ApiController]
     public class SearchController : ControllerBase
     {
-        private readonly IElasticClient _elasticClient;
-
-        public SearchController(IElasticClient elasticClient)
+        private readonly ISearchService<Document> _searchService;
+        public SearchController(ISearchService<Document> searchService)
         {
-            _elasticClient = elasticClient;
+            _searchService = searchService;
         }
 
         [HttpGet("get-all-documents")]
-        public IActionResult GetAllDocuments(string? indexName, int size = 1000)
+        public async Task<IActionResult> GetAllDocuments(string? indexName)
         {
-            indexName ??= _elasticClient.ConnectionSettings.DefaultIndex;
+            var response = await _searchService.GetAllDocumentsAsync(indexName);
 
-            var response = _elasticClient.Search<Document>(s => s
-                .Index(indexName)
-                .Query(q => q.MatchAll())
-                .Size(size)
-            );
-
-            if (response.IsValid)
+            if (response.IsSuccess)
             {
-                return Ok(response.Documents);
+                return Ok(response.Data);
             }
-            return BadRequest(response.OriginalException?.Message);
-        }
-
-        [HttpPost]
-        public IActionResult AddDocument([FromBody] Document document)
-        {
-            var response = _elasticClient.IndexDocument(document);
-            if (response.IsValid)
-            {
-                return Ok(response.Id);
-            }
-            return BadRequest(response.OriginalException?.Message);
-        }
-
-        [HttpDelete("{id}")]
-        public IActionResult DeleteDocument(string id)
-        {
-            var response = _elasticClient.Delete<Document>(id);
-            if (response.IsValid)
-            {
-                return Ok();
-            }
-            return NotFound(response.OriginalException?.Message);
+            return BadRequest(response.ErrorMessage);
         }
 
         [HttpPost("create-index")]
-        public IActionResult CreateIndex(string indexName)
+        public async Task<IActionResult> CreateIndex(string indexName)
         {
-            var createIndexResponse = _elasticClient.Indices.Create(indexName, c => c
-                .Map<Document>(m => m
-                    .AutoMap()
-                )
-            );
+            var createIndexResponse = await _searchService.CreateIndexAsync(indexName);
 
-            if (createIndexResponse.IsValid)
+            if (createIndexResponse)
             {
-                return Ok($"Index {indexName} created successfully.");
+                return Ok("Index created successfully");
             }
-            return BadRequest(createIndexResponse.OriginalException?.Message);
-        }
-
-        [HttpPost("add-to-index/{indexName}")]
-        public IActionResult AddDocumentToIndex(string indexName, [FromBody] Document document)
-        {
-            var response = _elasticClient.Index(document, idx => idx.Index(indexName));
-            if (response.IsValid)
-            {
-                return Ok(response.Id);
-            }
-            return BadRequest(response.OriginalException?.Message);
-        }
-
-        [HttpDelete("delete-from-index/{indexName}/{id}")]
-        public IActionResult DeleteDocumentFromIndex(string indexName, string id)
-        {
-            var response = _elasticClient.Delete(new DeleteRequest(indexName, id));
-            if (response.IsValid)
-            {
-                return Ok();
-            }
-            return NotFound(response.OriginalException?.Message);
+            return BadRequest("Failed to create index");
         }
 
         [HttpDelete("delete-index/{indexName}")]
-        public IActionResult DeleteIndex(string indexName)
+        public async Task<IActionResult> DeleteIndex(string indexName)
         {
-            var response = _elasticClient.Indices.Delete(indexName);
-            if (response.IsValid)
-            {
-                return Ok($"Index {indexName} deleted successfully.");
-            }
-            return BadRequest(response.OriginalException?.Message);
-        }
-    }
+            var deleteIndexResponse = await _searchService.DeleteIndexAsync(indexName);
 
-    public class Document
-    {
-        public string Title { get; set; }
-        public string Author { get; set; }
-        public DateTime PublishedDate { get; set; }
+            if (deleteIndexResponse)
+            {
+                return Ok("Index deleted successfully.");
+            }
+            return NotFound("Index not found.");
+        }
+
+        [HttpPost("add-document")]
+        public async Task<IActionResult> AddDocument(string? indexName, [FromBody] Document document)
+        {
+            var response = await _searchService.AddDocumentAsync(indexName, document);
+            if (response.IsSuccess)
+            {
+                return Ok(response.Data);
+            }
+            return BadRequest(response.ErrorMessage);
+        }
+
+        [HttpDelete("delete-document/{id}")]
+        public async Task<IActionResult> DeleteDocument(string? indexName, string id)
+        {
+            var response = await _searchService.DeleteDocumentAsync(indexName, id);
+            if (response.IsSuccess)
+            {
+                return Ok(response.Data);
+            }
+            return NotFound(response.ErrorMessage);
+        }
     }
 }

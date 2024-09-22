@@ -114,6 +114,7 @@ builder.Services.AddTransient<ICalisanService, CalisanService>();
 builder.Services.AddTransient<IControllerActionRoleService, ControllerActionRoleService>();
 
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped(typeof(ISearchService<>), typeof(SearchService<>));
 builder.Services.AddScoped<ICalisanRepository, CalisanRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IControllerActionRoleRepository, ControllerActionRoleRepository>();
@@ -132,13 +133,21 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Secret"])),
         ValidateIssuer = true,
         ValidateAudience = true,
-        ValidateLifetime = true,
+        ValidateLifetime = false,
         ValidateIssuerSigningKey = true,
         ClockSkew = TimeSpan.Zero
     };
 });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminPolicy", policy =>
+        policy.RequireRole("Admin"));
+    options.AddPolicy("UserPolicy", policy =>
+        policy.RequireRole("User"));
+});
+
+// builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -148,9 +157,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("AllowAllOrigins");
+// app.UseHttpsRedirection();
 
-app.UseHttpsRedirection();
+app.UseCors("AllowAllOrigins");
 
 app.UseAuthentication();
 app.UseAuthorization();
