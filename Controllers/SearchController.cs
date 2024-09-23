@@ -12,7 +12,7 @@ namespace Demo.Controllers
         public SearchController(ISearchService<Document> searchService)
         {
             _searchService = searchService;
-        }
+        } 
 
         [HttpGet("get-all-documents")]
         public async Task<IActionResult> GetAllDocuments(string? indexName)
