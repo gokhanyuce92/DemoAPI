@@ -16,7 +16,6 @@ namespace Demo.Controllers
         }
 
         [HttpGet("{key}")]
-        [Authorize]
         public async Task<IActionResult> Get(string key)
         {
             var value = await _redisCacheService.GetValueAsync(key);
@@ -28,7 +27,6 @@ namespace Demo.Controllers
         }
 
         [HttpPost]
-        [Authorize]
         public async Task<IActionResult> Set([FromBody] RedisCacheRequestModel redisCacheRequestModel)
         {
             bool success = await _redisCacheService.SetValueAsync(redisCacheRequestModel.Key, redisCacheRequestModel.Value, TimeSpan.FromHours(1));
@@ -40,7 +38,6 @@ namespace Demo.Controllers
         }
 
         [HttpDelete("{key}")]
-        [Authorize]
         public async Task<IActionResult> Delete(string key)
         {
             await _redisCacheService.Clear(key);

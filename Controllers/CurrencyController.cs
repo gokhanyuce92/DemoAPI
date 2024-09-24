@@ -18,8 +18,11 @@ namespace Demo.Controllers
             _searchService = searchService;
         }
 
+        /// <summary>
+        /// UserPolicy yetkisine sahip kullanıcılar döviz kurlarını çekebilir.
+        /// </summary>
+        [Authorize(Policy = "UserPolicy")]
         [HttpGet]
-        [Authorize(Policy = "AdminPolicy")]
         public async Task<IActionResult> Get()
         {
             var currencies = await _currencyService.GetAllExchangeRatesAsync();

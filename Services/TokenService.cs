@@ -11,10 +11,12 @@ namespace Demo.Services
     {
         private readonly IConfiguration configuration;
         private readonly IUserRoleService _userRoleService;
-        public TokenService(IConfiguration configuration, IUserRoleService userRoleService)
+        private readonly IRedisCacheService _redisCacheService;
+        public TokenService(IConfiguration configuration, IUserRoleService userRoleService, IRedisCacheService redisCacheService)
         {
             this.configuration = configuration;
             this._userRoleService = userRoleService;
+            this._redisCacheService = redisCacheService;
         }
 
         public async Task<Result<GenerateTokenResponse>> GenerateTokenAsync(GenerateTokenRequest request)
@@ -33,14 +35,17 @@ namespace Demo.Services
                 var roles = await _userRoleService.GetUserRolesAsync(new() { UserName = request.UserName });
                 if (roles.IsSuccess)
                 {
+                    var redisKey = $"user:roles:{request.UserId}";
+                    string roleDatas = string.Join(",", roles.Data);
+                    
                     foreach (var role in roles.Data)
                     {
-                        claims.Add(new Claim(ClaimTypes.Role, role));
+                        // claims.Add(new Claim(ClaimTypes.Role, role));
+                        await _redisCacheService.SetAddAsync(redisKey, role);
                     }
                 }
 
                 var utcTime = DateTime.UtcNow;
-
                 var tokenExpireDate = utcTime.Add(TimeSpan.FromMinutes(10));
 
                 JwtSecurityToken jwtSecurityToken = new JwtSecurityToken(

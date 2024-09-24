@@ -13,13 +13,10 @@ namespace Demo.Controllers
         private readonly IAuthService authService;
         private readonly IRedisCacheService redisCacheService;
 
-        public AuthController(ILogger<AuthController> logger, 
-        IAuthService authService, 
-        IRedisCacheService redisCacheService)
+        public AuthController(ILogger<AuthController> logger, IAuthService authService)
         {
             this._logger = logger;
             this.authService = authService;
-            this.redisCacheService = redisCacheService;
         }
 
         [HttpPost("login")]
@@ -34,8 +31,6 @@ namespace Demo.Controllers
 
                 return BadRequest(result.ErrorMessage);
             }
-            
-            await redisCacheService.SetValueAsync("AuthToken", result.Data.AuthToken);
             
             return Ok(result.Data);
         }

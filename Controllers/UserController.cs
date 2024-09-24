@@ -9,7 +9,6 @@ namespace Demo.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "User")]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -18,9 +17,12 @@ namespace Demo.Controllers
             _userService = userService;
         }
         
-
+        /// <summary>
+        /// AdminPolicy yetkisine sahip sistem yöneticisi yeni kullanıcı ekler.
+        /// </summary>
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPost]
-        public async Task<IActionResult> Post(AddUserRequestDTO addUserRequestDTO)
+        public async Task<IActionResult> Post([FromBody] AddUserRequestDTO addUserRequestDTO)
         {
             var response = await _userService.AddAsync(addUserRequestDTO);
 

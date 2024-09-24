@@ -36,5 +36,16 @@ namespace Demo.Services
         {
             return await _database.StringSetAsync(key, value, expiry);
         }
+
+        public async Task<bool> SetAddAsync(string key, string value)
+        {
+            return await _database.SetAddAsync(key, value);
+        }
+
+        public async Task<IEnumerable<string>> SetMembersAsync(string key)
+        {
+            var members = await _database.SetMembersAsync(key);
+            return members.Select(member => member.ToString());
+        }
     }
 }

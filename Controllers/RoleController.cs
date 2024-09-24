@@ -7,10 +7,10 @@ namespace Demo.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
     public class RoleController : ControllerBase
     {
         private readonly IRoleService _roleService;
+        
         public RoleController(IRoleService roleService)
         {
             this._roleService = roleService;
@@ -22,6 +22,10 @@ namespace Demo.Controllers
             return Ok(_roleService.GetRoles());
         }
 
+        /// <summary>
+        /// AdminPolicy yetkisine sahip sistem yöneticisi yeni bir rol oluşturabilir.
+        /// </summary>
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPost("CreateRole")]
         public async Task<IActionResult> CreateRoleAsync(CreateRoleRequestDTO createRoleRequestDTO)
         {
@@ -34,6 +38,10 @@ namespace Demo.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// AdminPolicy yetkisine sahip sistem yöneticisi var olan bir rolü güncelleyebilir.
+        /// </summary>
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPut("UpdateRole")]
         public async Task<IActionResult> UpdateRoleAsync(UpdateRoleRequestDTO updateRoleRequestDTO)
         {

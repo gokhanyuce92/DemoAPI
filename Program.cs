@@ -13,6 +13,7 @@ using Microsoft.OpenApi.Models;
 using Nest;
 using Serilog;
 using StackExchange.Redis;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,7 +47,8 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 .AddDefaultTokenProviders()
 .AddTokenProvider<DataProtectorTokenProvider<AppUser>>("DataProtectorTokenProvider<AppUser>");
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddNewtonsoftJson();
 
 // CORS hizmetini ekleyin ve politikayı tanımlayın
 builder.Services.AddCors(options =>
@@ -87,6 +89,10 @@ builder.Services.AddSwaggerGen(c => {
             new string[] {}
         }
     });
+    // Include XML comments (assuming the XML file is in the output directory)
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
 });
 
 
@@ -154,18 +160,15 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Demo API v1"));
 }
 
 // app.UseHttpsRedirection();
-
 app.UseCors("AllowAllOrigins");
 
 app.UseAuthentication();
+app.UseMiddleware<RoleMiddleware>();
 app.UseAuthorization();
-
-// app.UseMiddleware<TokenAuthenticationMiddleware>();
-// app.UseMiddleware<AuthorizationMiddleware>();
 
 app.MapControllers();
 
