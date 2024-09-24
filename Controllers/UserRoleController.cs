@@ -19,8 +19,8 @@ namespace Demo.Controllers
             this._userRoleService = userRoleService;
         }
 
-        [HttpGet("GetUserRoles")]
-        public async Task<IActionResult> GetUserRolesAsync(GetUserRolesRequestDTO getUserRolesRequestDTO)
+        [HttpPost("GetUserRoles")]
+        public async Task<IActionResult> GetUserRolesAsync([FromBody] GetUserRolesRequestDTO getUserRolesRequestDTO)
         {
             var response = await _userRoleService.GetUserRolesAsync(getUserRolesRequestDTO);
             if (!response.IsSuccess)
@@ -31,8 +31,12 @@ namespace Demo.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// AdminPolicy yetkisine sahip sistem yöneticisi kullanıcıya rol atayabilir.
+        /// </summary>
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPost("AddUserToRole")]
-        public async Task<IActionResult> AddUserToRoleAsync(AddUserRoleRequestDTO addUserRoleRequestDTO)
+        public async Task<IActionResult> AddUserToRoleAsync([FromBody] AddUserRoleRequestDTO addUserRoleRequestDTO)
         {
             var response = await _userRoleService.AddUserRoleAsync(addUserRoleRequestDTO);
             if (!response.IsSuccess)
@@ -43,8 +47,12 @@ namespace Demo.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// AdminPolicy yetkisine sahip sistem yöneticisi kullanıcıdan rolü geri alabilir.
+        /// </summary>
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPost("RemoveUserFromRole")]
-        public async Task<IActionResult> RemoveUserFromRoleAsync(RemoveUserRoleRequestDTO removeUserRoleRequestDTO)
+        public async Task<IActionResult> RemoveUserFromRoleAsync([FromBody] RemoveUserRoleRequestDTO removeUserRoleRequestDTO)
         {
             var response = await _userRoleService.RemoveUserRoleAsync(removeUserRoleRequestDTO);
             if (!response.IsSuccess)
