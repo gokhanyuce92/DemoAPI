@@ -8,10 +8,6 @@ trigger:
 
 pool:
   vmImage: 'ubuntu-latest'  # veya 'ubuntu-latest' kullanabilirsiniz
-
-variables:
-  buildConfiguration: 'Release'
-
 steps:
 - task: UseDotNet@2
   inputs:
@@ -22,10 +18,10 @@ steps:
 - script: dotnet restore
   displayName: 'Restore dependencies'
 
-- script: dotnet build --configuration $(buildConfiguration)
+- script: dotnet build --configuration $(BuildConfiguration)
   displayName: 'Build project'
 
-- script: dotnet test --configuration $(buildConfiguration) --no-build --verbosity normal
+- script: dotnet test --configuration $(BuildConfiguration) --no-build --verbosity normal
   displayName: 'Run tests'
 
 - task: PublishTestResults@2
