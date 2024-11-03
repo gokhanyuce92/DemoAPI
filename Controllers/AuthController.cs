@@ -8,7 +8,7 @@ namespace Demo.Controllers
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
-    {
+    { 
         private readonly ILogger<AuthController> _logger;
         private readonly IAuthService authService;
 
