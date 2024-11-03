@@ -10,29 +10,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Nest;
-using Serilog;
-using StackExchange.Redis;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 IConfiguration configuration = builder.Configuration;
-var redisConnection = ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis"));
 var MySQLConnection = configuration.GetConnectionString("MySQLConnection");
-
-// Serilog yapılandırması
-var logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
-    .WriteTo.MySQL(
-        connectionString: MySQLConnection,
-        tableName: "Logs"
-    )
-    // .Enrich.With(new UserNameEnricher(builder.Services.BuildServiceProvider().GetService<IHttpContextAccessor>()))
-    .CreateLogger();
-builder.Logging.ClearProviders();
-// Add Serilog Library
-builder.Logging.AddSerilog(logger);
     
 builder.Services.AddDbContext<MyDbContext>(options =>
     options.UseMySql(MySQLConnection, 
@@ -98,19 +81,8 @@ builder.Services.AddSwaggerGen(c => {
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-// Elasticsearch bağlantı ayarlarını yapılandırın
-var elasticUri = configuration["Elasticsearch:Uri"];
-var defaultIndex = configuration["Elasticsearch:DefaultIndex"];
-var settings = new ConnectionSettings(new Uri(elasticUri))
-    .DefaultIndex(defaultIndex);
-
-var client = new ElasticClient(settings);
-builder.Services.AddSingleton<IElasticClient>(client);
-
-builder.Services.AddSingleton<IConnectionMultiplexer>(redisConnection);
 builder.Services.AddTransient<ITokenService, TokenService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
-builder.Services.AddSingleton<IRedisCacheService, RedisCacheService>();
 
 builder.Services.AddTransient<ICurrencyService, CurrencyService>();
 builder.Services.AddTransient<IUserService, UserService>();

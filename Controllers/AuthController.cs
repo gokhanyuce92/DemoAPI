@@ -11,7 +11,6 @@ namespace Demo.Controllers
     {
         private readonly ILogger<AuthController> _logger;
         private readonly IAuthService authService;
-        private readonly IRedisCacheService redisCacheService;
 
         public AuthController(ILogger<AuthController> logger, IAuthService authService)
         {

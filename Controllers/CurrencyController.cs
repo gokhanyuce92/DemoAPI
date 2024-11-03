@@ -11,26 +11,19 @@ namespace Demo.Controllers
     public class CurrencyController : ControllerBase
     {
         private readonly ICurrencyService _currencyService;
-        private readonly ISearchService<Currency> _searchService;
-        public CurrencyController(ICurrencyService currencyService, ISearchService<Currency> searchService)
+        public CurrencyController(ICurrencyService currencyService)
         {
             _currencyService = currencyService;
-            _searchService = searchService;
         }
 
         /// <summary>
         /// UserPolicy yetkisine sahip kullanıcılar döviz kurlarını çekebilir.
         /// </summary>
-        [Authorize(Policy = "UserPolicy")]
         [HttpGet]
         public async Task<IActionResult> Get()
         {
             var currencies = await _currencyService.GetAllExchangeRatesAsync();
 
-            foreach (var currency in currencies)
-            {
-                await _searchService.AddDocumentAsync("currency-index", currency);
-            }
             return Ok(currencies);
         }
     }

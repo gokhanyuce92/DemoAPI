@@ -11,12 +11,10 @@ namespace Demo.Services
     {
         private readonly IConfiguration configuration;
         private readonly IUserRoleService _userRoleService;
-        private readonly IRedisCacheService _redisCacheService;
-        public TokenService(IConfiguration configuration, IUserRoleService userRoleService, IRedisCacheService redisCacheService)
+        public TokenService(IConfiguration configuration, IUserRoleService userRoleService)
         {
             this.configuration = configuration;
             this._userRoleService = userRoleService;
-            this._redisCacheService = redisCacheService;
         }
 
         public async Task<Result<GenerateTokenResponse>> GenerateTokenAsync(GenerateTokenRequest request)
@@ -41,7 +39,6 @@ namespace Demo.Services
                     foreach (var role in roles.Data)
                     {
                         // claims.Add(new Claim(ClaimTypes.Role, role));
-                        await _redisCacheService.SetAddAsync(redisKey, role);
                     }
                 }
 
