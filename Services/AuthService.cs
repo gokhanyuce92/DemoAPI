@@ -16,7 +16,7 @@ namespace Demo.Services
             this._userManager = userManager;
         }
 
-        public async Task<Result<UserLoginResponse>> LoginUserAsync(UserLoginRequest request)
+            public async Task<Result<UserLoginResponse>> LoginUserAsync(UserLoginRequest request)
         {
             if (string.IsNullOrEmpty(request.Username))
                 return new Result<UserLoginResponse> { IsSuccess = false, ErrorMessage = "Kullanıcı adı boş olamaz." };
