@@ -17,7 +17,7 @@ namespace Demo.Controllers
             _calisanRepository = calisanRepository;
         }
 
-        [HttpGet]
+        [HttpGet] 
         public async Task<IActionResult> Get()
         {
             await _calisanRepository.AddAsync(new Calisan
